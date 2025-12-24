@@ -5,8 +5,7 @@
 
 // Structure of the graph
 typedef struct {
-	int n;
-	int m;
+	int n, m;
 	int mat[NMAX][NMAX];
 } Graph;
 
