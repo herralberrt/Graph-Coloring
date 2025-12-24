@@ -1,0 +1,14 @@
+# Python virtual environment
+venv/
+
+# Compiled binaries
+bin/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Temporary files
+*.out
+*.log
+input.in
