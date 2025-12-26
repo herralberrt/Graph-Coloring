@@ -85,10 +85,14 @@ Un fișier de intrare conține:
 
 Exemplu:
 
+```
+
 4 3
 0 1
 1 2
 2 3
+
+```
 
 ### Format de ieșire
 
@@ -98,8 +102,12 @@ Pentru fiecare algoritm, ieșirea este:
 
 Exemplu:
 
+```
+
 2
 0 1 0 1
+
+```
 
 ## Generarea testelor
 
