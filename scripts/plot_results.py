@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 
 
-# Fixed colors and line styles for each algorithm
 ALGO_STYLE = {
     "backtracking": {
         "color": "tab:blue",
@@ -67,7 +66,6 @@ def average_by_key(rows, key_x, key_y):
     return x_vals, y_vals
 
 
-# Comparative plots
 def plot_time_vs_vertices(data, output_dir):
     """
     Comparative plot: execution time vs number of vertices.
@@ -109,7 +107,12 @@ def plot_colors_vs_density(data, output_dir):
         for r in rows:
             n = r["vertices"]
             m = r["edges"]
-            density = m / (n * (n - 1) / 2)
+            max_edges = n * (n - 1) / 2
+
+            if max_edges == 0:
+                continue
+
+            density = round(m / max_edges, 2)
             grouped[density].append(r["colors"])
 
         x_vals = []
@@ -138,7 +141,6 @@ def plot_colors_vs_density(data, output_dir):
     plt.close()
 
 
-# Per-algorithm plots
 def plot_per_algorithm(data, output_dir):
     """
     Generates individual plots for each algorithm.
@@ -172,7 +174,12 @@ def plot_per_algorithm(data, output_dir):
         for r in rows:
             n = r["vertices"]
             m = r["edges"]
-            density = m / (n * (n - 1) / 2)
+            max_edges = n * (n - 1) / 2
+
+            if max_edges == 0:
+                continue
+
+            density = round(m / max_edges, 2)
             grouped[density].append(r["colors"])
 
         x_vals = []

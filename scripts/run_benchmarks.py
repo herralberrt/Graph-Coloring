@@ -12,17 +12,24 @@ def run_algorithm(executable, input_file):
 
     start_time = time.perf_counter()
 
-    process = subprocess.run(
-        [executable],
-        stdin=open(input_file, "r"),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
+    with open(input_file, "r") as fin:
+        process = subprocess.run(
+            [executable],
+            stdin=fin,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
 
     end_time = time.perf_counter()
+
     output_lines = process.stdout.strip().splitlines()
-    colors_used = int(output_lines[0])
+
+    if len(output_lines) == 0:
+        colors_used = 0
+    else:
+        colors_used = int(output_lines[0])
+
     exec_time = end_time - start_time
 
     return colors_used, exec_time
@@ -41,10 +48,10 @@ def main():
         "rlf": os.path.join(bin_dir, "rlf")
     }
 
-    test_files = sorted([
+    test_files = sorted(
         f for f in os.listdir(tests_dir)
         if f.endswith(".in")
-    ])
+    )
 
     with open(output_csv, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)

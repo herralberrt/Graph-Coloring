@@ -3,6 +3,7 @@ import os
 
 NMAX = 20
 
+
 def generate_graph(n, density):
     """
     Generates an undirected graph with n vertices and given density.
@@ -23,9 +24,7 @@ def generate_graph(n, density):
             continue
 
         if u > v:
-            aux = u
-            u = v
-            v = aux
+            u, v = v, u
 
         if (u, v) in used:
             continue
@@ -44,9 +43,7 @@ def write_test(filename, n, edges):
     with open(filename, "w") as f:
         f.write(str(n) + " " + str(len(edges)) + "\n")
 
-        for edge in edges:
-            u = edge[0]
-            v = edge[1]
+        for u, v in edges:
             f.write(str(u) + " " + str(v) + "\n")
 
 
@@ -58,7 +55,32 @@ def main():
 
     if not os.path.exists(tests_dir):
         os.mkdir(tests_dir)
+
     test_id = 1
+
+    small_sizes = [2, 3]
+    small_densities = [0.0, 0.3, 0.6, 1.0]
+
+    for n in small_sizes:
+        for density in small_densities:
+            edges = generate_graph(n, density)
+            filename = os.path.join(
+                tests_dir, "test_" + str(test_id).zfill(2) + ".in"
+            )
+            write_test(filename, n, edges)
+            test_id += 1
+
+    medium_sizes = [5, 6, 7]
+    medium_densities = [0.2, 0.5, 0.8]
+
+    for n in medium_sizes:
+        for density in medium_densities:
+            edges = generate_graph(n, density)
+            filename = os.path.join(
+                tests_dir, "test_" + str(test_id).zfill(2) + ".in"
+            )
+            write_test(filename, n, edges)
+            test_id += 1
 
     sizes = [4, 8, 10, 12, 15, 18, 20]
     densities = [0.2, 0.4, 0.6, 0.8]
@@ -66,8 +88,9 @@ def main():
     for n in sizes:
         for density in densities:
             edges = generate_graph(n, density)
-
-            filename = os.path.join(tests_dir, "test_" + str(test_id).zfill(2) + ".in")
+            filename = os.path.join(
+                tests_dir, "test_" + str(test_id).zfill(2) + ".in"
+            )
             write_test(filename, n, edges)
             test_id += 1
 

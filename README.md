@@ -5,8 +5,7 @@ minim de culori.
 
 ## Algoritmi implementați
 
-În cadrul proiectului au fost implementați următorii algoritmi de
-colorare a grafurilor:
+În cadrul proiectului am implementat următorii algoritmi:
 
 ### Backtracking
 
@@ -112,6 +111,16 @@ Scriptul generează grafuri neorientate cu:
 Pentru fiecare combinație de dimensiune și densitate se generează un fișier
 de test în directorul `tests/`.
 
+## Experimental setup
+
+Testele au fost limitate la grafuri cu maximum 20 de vârfuri pentru a permite
+rularea algoritmului exact (backtracking) într-un timp rezonabil. Acesta este
+folosit ca referință pentru evaluarea calității soluțiilor euristice.
+
+Pentru fiecare dimensiune a grafului au fost generate instanțe cu densități
+diferite, pentru a analiza influența structurii grafului asupra performanței
+algoritmilor.
+
 ### Rulare generator teste
 
 Din directorul principal al proiectului:
@@ -132,18 +141,12 @@ Scriptul:
 - citește fișierele de test din `tests/`
 - salvează rezultatele într-un fișier `results.csv`
 
-### Rulare benchmark
+## Solution quality
 
-Din directorul principal al proiectului:
-
-- python3 scripts/run_benchmarks.py
-
-La finalul rulării, fișierul `results.csv` va conține, pentru fiecare test
-și fiecare algoritm:
-- numărul de vârfuri
-- numărul de muchii
-- numărul de culori folosite
-- timpul de execuție
+Algoritmul de backtracking oferă soluția optimă pentru fiecare instanță.
+Rezultatele obținute cu algoritmii euristici (DSATUR și RLF) sunt comparate
+direct cu această soluție optimă, folosind numărul de culori ca metrică de
+calitate.
 
 ## Generarea și interpretarea graficelor
 
@@ -152,6 +155,12 @@ care evidențiază diferențele dintre algoritmi, atât din punct de vedere al
 timpului de execuție, cât și al calității soluției.
 
 Graficele sunt generate folosind scriptul `plot_results.py`.
+
+## Observations
+
+Pentru grafuri foarte mici, timpul de execuție este dominat de costurile fixe
+de inițializare, rulare a proceselor și citire a fișierelor de intrare. Din acest
+motiv, aceste instanțe pot apărea ca fiind mai lente decât grafuri ușor mai mari.
 
 ### Rulare script pentru grafice
 
@@ -165,3 +174,11 @@ Scriptul generează următoarele grafice:
 - grafice separate pentru fiecare algoritm
 
 Toate graficele sunt salvate în directorul `plots/`.
+
+## Conclusions
+
+Algoritmul de backtracking garantează soluția optimă, dar este practic utilizabil
+doar pentru grafuri mici. Algoritmii euristici, în special DSATUR, oferă soluții
+apropiate de optim într-un timp foarte redus, fiind mai potriviți pentru grafuri
+mai mari. RLF poate fi eficient pentru grafuri dense, însă calitatea soluției
+depinde de structura instanței.
