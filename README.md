@@ -48,25 +48,28 @@ Dezavantaje:
 
 Structura proiectului este:
 
+```
 .
-├── backtracking.c # Algoritm exact de colorare
-├── dsatur.c # Algoritmul DSATUR
-├── rlf.c # Algoritmul RLF
-├── bin/ # Executabilele compilate
-│ ├── backtracking
-│ ├── dsatur
-│ └── rlf
+├── backtracking.c        # Algoritm exact de colorare
+├── dsatur.c              # Algoritmul DSATUR
+├── rlf.c                 # Algoritmul RLF
+├── bin/                  # Executabilele compilate
+│   ├── backtracking
+│   ├── dsatur
+│   └── rlf
 ├── scripts/
-│ ├── generate_tests.py # Generator de teste
-│ ├── run_benchmarks.py # Rulare benchmark
-│ └── plot_results.py # Generare grafice
-├── tests/ # Fisiere de test generate
-├── plots/ # Graficele rezultate
-│ ├── time_vs_vertices.png
-│ ├── colors_vs_density.png
-│ └── per_algorithm/
-├── results.csv # Rezultatele benchmark-ului
+│   ├── generate_tests.py # Generator de teste
+│   ├── run_benchmarks.py # Rulare benchmark
+│   └── plot_results.py   # Generare grafice
+├── tests/                # Fisiere de test generate
+├── plots/                # Graficele rezultate
+│   ├── time_vs_vertices.png
+│   ├── colors_vs_density.png
+│   └── per_algorithm/
+├── results.csv            # Rezultatele benchmark-ului
 └── README.md
+
+```
 
 ## Formatul de intrare și ieșire
 
