@@ -1,0 +1,463 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Experimental Analysis of Graph Coloring Algorithms}
+
+\author{
+Albert-Iulian Romaniuc \and
+C\u{a}lin-Andrei Necula \and
+\c{S}tefan Solomon
+}
+
+\institute{Proiect - Analiza Algoritmilor}
+
+\maketitle
+
+\begin{abstract}
+Colorarea grafurilor este o problemă clasică de optimizare combinatorială,
+cunoscută ca fiind NP-hard, cu aplicații în planificare, alocarea
+registrelor și analiza rețelelor. În această lucrare studiem problema
+NP-2 Graph Coloring prin compararea unei soluții exacte bazate pe backtracking
+cu doi algoritmi euristici bine cunoscuți: DSATUR și Recursive Largest First
+(RLF). Algoritmul exact este utilizat ca referință pentru evaluarea calității
+soluțiilor euristice. Analiza experimentală este realizată pe grafuri generate
+aleator, de dimensiuni și densități diferite, luând în considerare atât timpul
+de execuție, cât și numărul de culori utilizate. Rezultatele evidențiază
+compromisul dintre optimalitate și eficiență și arată că metodele euristice
+pot furniza soluții apropiate de optim într-un timp de calcul mult mai redus.
+\end{abstract}
+
+\section{Introducere}
+
+Problema colorării grafurilor este una dintre problemele fundamentale din
+teoria grafurilor și optimizarea combinatorială. Dat fiind un graf neorientat,
+scopul este atribuirea unei culori fiecărui vârf astfel încât două vârfuri
+adiacente să nu aibă aceeași culoare, utilizând un număr minim de culori.
+Determinarea numărului cromatic al unui graf este o problemă NP-hard,
+ceea ce face ca soluțiile exacte să devină rapid imposibil de calculat pentru
+instanțe de dimensiuni mari.
+
+Din cauza acestei complexități, au fost propuse numeroase algoritmi euristici
+și aproximativi care urmăresc obținerea unor soluții de bună calitate într-un
+timp rezonabil. Printre aceștia, algoritmii DSATUR și Recursive Largest First
+(RLF) sunt metode greedy populare, utilizate frecvent în practică datorită
+echilibrului dintre calitatea soluției și costul computațional. Cu toate
+acestea, performanța algoritmilor euristici depinde puternic de structura
+instanței analizate și este dificil de evaluat fără o soluție de referință.
+
+În această lucrare realizăm o analiză experimentală comparativă între un
+algoritm exact de tip backtracking și două abordări euristice, DSATUR și RLF.
+Algoritmul exact este folosit ca reper pentru evaluarea calității soluțiilor
+euristice, folosind numărul de culori ca metrică principală. Performanța
+algoritmilor este analizată atât din punct de vedere al timpului de execuție,
+cât și al calității soluției, pe grafuri cu dimensiuni și densități variate.
+Scopul studiului este evidențierea compromisurilor dintre optimalitate și
+eficiență în rezolvarea problemei NP-2 Graph Coloring.
+
+\section{Definirea problemei}
+
+Fie $G = (V, E)$ un graf neorientat, unde $V$ reprezintă mulțimea vârfurilor,
+iar $E \subseteq V \times V$ reprezintă mulțimea muchiilor. O colorare a
+grafului este o funcție $c : V \rightarrow \mathbb{N}$ care asociază fiecărui
+vârf o culoare, astfel încât pentru orice muchie $(u, v) \in E$ să fie
+îndeplinită condiția $c(u) \neq c(v)$.
+
+Numărul total de culori distincte utilizate într-o colorare este cardinalul
+mulțimii $\{c(v) \mid v \in V\}$. O colorare este considerată validă dacă
+respectă restricția de adiacență, iar obiectivul problemei este minimizarea
+numărului de culori folosite.
+
+Numărul cromatic al grafului $G$, notat cu $\chi(G)$, este definit ca fiind
+numărul minim de culori necesare pentru a obține o colorare validă a grafului.
+Determinarea exactă a numărului cromatic este o problemă NP-hard, ceea ce
+implică faptul că nu există algoritmi cunoscuți care să rezolve problema în
+timp polinomial pentru toate instanțele.
+
+În cadrul acestei lucrări, ne concentrăm asupra problemei NP-2 Graph Coloring,
+care constă în determinarea unei colorări valide cu un număr minim de culori,
+folosind atât metode exacte, cât și euristice, și în compararea performanței
+acestora din punct de vedere al calității soluției și al timpului de execuție.
+
+\section{Algoritmi}
+
+În această secțiune sunt prezentate metodele utilizate pentru rezolvarea
+problemei de colorare a grafurilor. Sunt analizate atât o abordare exactă,
+bazată pe backtracking, cât și două metode euristice, DSATUR și Recursive
+Largest First (RLF), care oferă soluții aproximative într-un timp de execuție
+semnificativ mai redus.
+
+\subsection{Algoritmul de backtracking}
+
+Algoritmul de backtracking explorează în mod sistematic toate posibilitățile
+de atribuire a culorilor vârfurilor unui graf, construind soluția pas cu pas.
+La fiecare etapă, se verifică dacă atribuirea curentă respectă restricțiile
+problemei, iar ramurile care conduc la soluții invalide sunt eliminate prin
+procesul de pruning.
+
+Această abordare garantează obținerea unei soluții optime, deoarece toate
+colorările posibile sunt analizate. Totuși, complexitatea sa este exponențială
+în raport cu numărul de vârfuri, ceea ce limitează aplicabilitatea algoritmului
+la grafuri de dimensiuni reduse.
+
+\subsection{Algoritmul DSATUR}
+
+DSATUR (Degree of Saturation) este un algoritm euristic greedy care selectează
+pentru colorare, la fiecare pas, vârful cu gradul de saturație maxim. Gradul
+de saturație al unui vârf reprezintă numărul de culori distincte utilizate de
+vecinii săi deja colorați.
+
+Prin prioritizarea vârfurilor cu cele mai restrictive condiții, DSATUR tinde
+să reducă numărul total de culori utilizate. Algoritmul oferă în practică
+soluții de calitate apropiată de optim, având un timp de execuție redus, însă
+nu garantează obținerea soluției optime pentru toate instanțele.
+
+\subsection{Algoritmul Recursive Largest First (RLF)}
+
+Algoritmul Recursive Largest First construiește colorarea grafului prin
+identificarea succesivă a unor mulțimi independente de vârfuri, cărora li se
+atribuie aceeași culoare. La fiecare iterație, algoritmul selectează un vârf
+cu grad mare și extinde mulțimea independentă prin adăugarea vârfurilor care
+nu sunt adiacente cu cele deja selectate.
+
+RLF este deosebit de eficient pentru grafuri dense, unde identificarea unor
+mulțimi independente mari poate conduce la o reducere a numărului total de
+culori. Cu toate acestea, performanța sa depinde de structura grafului, iar
+calitatea soluției poate varia de la o instanță la alta.
+
+\section{Setarea experimentală}
+
+Analiza experimentală are ca scop compararea performanței algoritmilor
+prezentați din punct de vedere al timpului de execuție și al calității
+soluției obținute. Pentru a permite utilizarea algoritmului exact de tip
+backtracking ca soluție de referință, experimentele au fost limitate la
+grafuri cu un număr redus de vârfuri.
+
+\subsection{Generarea instanțelor de test}
+
+Instanțele de test sunt grafuri neorientate generate aleator, cu un număr de
+vârfuri cuprins între 4 și 20. Această limitare este necesară deoarece
+complexitatea exponențială a algoritmului de backtracking face imposibilă
+rezolvarea instanțelor de dimensiuni mai mari într-un timp rezonabil.
+
+Pentru fiecare dimensiune a grafului au fost generate instanțe cu densități
+diferite, definite ca raportul dintre numărul de muchii existente și numărul
+maxim posibil de muchii. Prin variarea densității se urmărește analiza
+influenței structurii grafului asupra performanței algoritmilor.
+
+\subsection{Metrici de evaluare}
+
+Performanța algoritmilor este evaluată folosind două metrici principale:
+timpul de execuție și numărul de culori utilizate în soluția finală. Timpul
+de execuție este măsurat în secunde și reflectă eficiența algoritmului, în
+timp ce numărul de culori utilizate reprezintă calitatea soluției obținute.
+
+Algoritmul de backtracking este utilizat pentru determinarea soluției optime,
+iar rezultatele algoritmilor euristici sunt comparate direct cu această
+referință. În acest mod se poate evalua cât de apropiate sunt soluțiile
+euristice față de optim.
+
+\subsection{Mediul de rulare}
+
+Toate experimentele au fost realizate în aceleași condiții de rulare, folosind
+aceleași instanțe de test pentru fiecare algoritm, pentru a asigura o
+comparație corectă. Algoritmii au fost implementați în limbajul C, iar
+rularea și colectarea rezultatelor au fost automatizate prin scripturi
+auxiliare.
+
+\section{Rezultate experimentale}
+
+\subsection{Timpul de execuție}
+
+\subsubsection{Backtracking}
+
+Algoritmul de backtracking prezintă o creștere rapidă a timpului de execuție
+odată cu mărirea dimensiunii grafului. Acest comportament este așteptat, deoarece
+algoritmul explorează exhaustiv spațiul soluțiilor posibile.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\linewidth]{backtracking_time.png}
+\caption{Timpul de execuție al algoritmului de backtracking.}
+\label{fig:bt_time}
+\end{figure}
+
+Chiar și pentru grafuri cu un număr relativ mic de vârfuri, variațiile timpului
+de execuție devin vizibile, confirmând complexitatea exponențială a metodei.
+Acest fapt limitează utilizarea practică a algoritmului la instanțe de
+dimensiuni reduse.
+
+\newpage
+
+\subsubsection{DSATUR}
+
+Algoritmul prezintă un timp de execuție stabil pentru toate dimensiunile
+analizate. Spre deosebire de algoritmul de backtracking, care manifestă o
+creștere rapidă și fluctuații semnificative ale timpului de rulare, acesta
+menține valori reduse și relativ constante ale timpului de execuție pe întreg
+intervalul de grafuri testate. Acest comportament indică o scalabilitate
+superioară și o sensibilitate redusă la creșterea dimensiunii instanței.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\linewidth]{dsatur_time.png}
+\caption{Timpul de execuție al algoritmului DSATUR.}
+\label{fig:dsatur_time}
+\end{figure}
+
+Stabilitatea observată în Figura~\ref{fig:dsatur_time} este o consecință directă
+a caracterului euristic al algoritmului. DSATUR evită explorarea exhaustivă a
+spațiului soluțiilor și construiește colorarea incremental, selectând la fiecare
+pas vârful cu cel mai mare grad de saturație, adică vârful adiacent celor mai
+multe culori distincte deja utilizate.
+
+Prin prioritizarea vârfurilor cu cele mai restrictive condiții, algoritmul
+reduce probabilitatea apariției conflictelor în etapele târzii ale procesului
+de colorare. Această strategie limitează numărul de decizii costisitoare și
+conduce la un timp de execuție predictibil, chiar și pentru grafuri cu un număr
+mai mare de vârfuri.
+
+\newpage
+
+\subsubsection{Recursive Largest First}
+
+Algoritmul Recursive Largest First (RLF) prezintă un timp de execuție redus,
+comparabil cu cel al algoritmului DSATUR, însă cu variații mai pronunțate pe
+anumite instanțe. Spre deosebire de DSATUR, care manifestă un comportament
+temporal foarte stabil, RLF este mai sensibil la structura grafului analizat,
+în special la densitatea acestuia și la distribuția muchiilor.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\linewidth]{rlf_time.png}
+\caption{Timpul de execuție al algoritmului RLF.}
+\label{fig:rlf_time}
+\end{figure}
+
+Fluctuațiile observate în Figura~\ref{fig:rlf_time} sunt cauzate de modul de
+funcționare al algoritmului, care construiește colorarea prin identificarea
+succesivă a unor mulțimi independente maximale. Procesul de extindere a acestor
+mulțimi poate necesita un efort computațional suplimentar, în special pentru
+grafuri dense, unde restricțiile de adiacență sunt mai numeroase.
+
+În consecință, timpul de execuție al algoritmului RLF poate varia în funcție de
+structura instanței, chiar dacă dimensiunea grafului rămâne constantă. Cu toate
+acestea, algoritmul rămâne eficient din punct de vedere computațional și oferă
+performanțe competitive pentru o gamă largă de instanțe.
+
+\newpage
+
+\subsubsection{Comparație între algoritmi}
+
+Figura~\ref{fig:time_vs_vertices} prezintă o comparație directă a timpului de
+execuție pentru cei trei algoritmi analizați — backtracking, DSATUR și Recursive
+Largest First — în funcție de dimensiunea grafului. Se observă diferențe clare
+între abordarea exactă și metodele euristice. Algoritmul de backtracking
+manifestă o creștere rapidă a timpului de execuție odată cu mărirea numărului de
+vârfuri, comportament determinat de explorarea exhaustivă a spațiului
+soluțiilor, caracteristică problemelor NP-hard. Chiar și pentru grafuri de
+dimensiuni relativ reduse, timpul necesar devine semnificativ, limitând
+aplicabilitatea practică a metodei.
+
+În contrast, algoritmii euristici DSATUR și RLF prezintă timpi de execuție mult
+mai reduși și o evoluție controlată pe măsură ce dimensiunea instanței crește.
+DSATUR se remarcă printr-un comportament deosebit de stabil, cu variații minime,
+datorită strategiei sale bazate pe gradul de saturație, care prioritizează
+vârfurile critice încă din etapele incipiente ale colorării. Algoritmul RLF
+prezintă timpi comparabili, însă cu fluctuații mai vizibile, influențate de
+structura grafului și de dificultatea identificării mulțimilor independente.
+Per ansamblu, comparația evidențiază compromisul fundamental dintre
+optimalitate și eficiență: algoritmul exact garantează soluția optimă, dar este
+impracticabil pentru instanțe mai mari, în timp ce metodele euristice oferă
+soluții eficiente într-un timp de calcul semnificativ mai redus.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\linewidth]{time_vs_vertices.png}
+\caption{Comparația timpului de execuție între algoritmi.}
+\label{fig:time_vs_vertices}
+\end{figure}
+
+\newpage
+
+\subsection{Numărul de culori utilizate}
+
+\subsubsection{Backtracking}
+
+Algoritmul de backtracking furnizează în toate cazurile soluția optimă,
+reprezentând un reper pentru evaluarea performanței algoritmilor euristici.
+Numărul de culori utilizate reflectă direct numărul cromatic al grafului
+analizat și este independent de ordinea de procesare a vârfurilor, deoarece
+algoritmul explorează exhaustiv toate colorările valide posibile.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\linewidth]{backtracking_colors.png}
+\caption{Numărul de culori utilizate de algoritmul de backtracking în funcție de densitatea grafului.}
+\label{fig:bt_colors}
+\end{figure}
+
+Se observă că, pe măsură ce densitatea grafului crește, numărul de culori
+necesare crește de asemenea. Acest comportament este așteptat, deoarece grafurile
+mai dense impun mai multe restricții de adiacență între vârfuri, reducând
+posibilitatea reutilizării aceleiași culori pentru vârfuri neadiacente.
+
+În consecință, creșterea densității conduce la o creștere a numărului cromatic
+al grafului, iar algoritmul de backtracking reflectă fidel această evoluție,
+furnizând valoarea optimă pentru fiecare instanță analizată. Din acest motiv,
+rezultatele obținute prin backtracking sunt utilizate ca referință în analiza
+comparativă a calității soluțiilor euristice.
+
+\newpage
+
+\subsubsection{DSATUR}
+
+Algoritmul DSATUR urmărește obținerea unei colorări eficiente prin
+prioritizarea vârfurilor cu grad mare de saturație, ceea ce conduce, în
+practică, la soluții apropiate de optim din punct de vedere al numărului de
+culori utilizate. Prin selectarea vârfurilor care au cele mai multe restricții
+impuse de vecinătatea deja colorată, algoritmul limitează apariția conflictelor
+și reduce necesitatea introducerii unor culori suplimentare.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\linewidth]{dsatur_colors.png}
+\caption{Numărul de culori utilizate de algoritmul DSATUR în funcție de densitatea grafului.}
+\label{fig:dsatur_colors}
+\end{figure}
+
+Rezultatele arată că DSATUR obține, în majoritatea instanțelor testate, un număr
+de culori foarte apropiat de soluția optimă furnizată de backtracking.
+Comportamentul algoritmului este relativ stabil pentru densități diferite, iar
+abaterile față de optim sunt reduse, chiar și pe măsură ce graful devine mai
+dens.
+
+Această stabilitate indică faptul că strategia bazată pe gradul de saturație
+reprezintă un criteriu eficient de selecție a vârfurilor în procesul de
+colorare. În consecință, DSATUR constituie o alternativă practică la metodele
+exacte pentru grafuri de dimensiuni mai mari, oferind un compromis favorabil
+între calitatea soluției și costul computațional.
+
+\newpage
+
+\subsubsection{Recursive Largest First}
+
+Algoritmul Recursive Largest First construiește colorarea prin identificarea
+succesivă a unor mulțimi independente, iar calitatea soluției obținute depinde
+în mod direct de modul în care aceste mulțimi pot fi extinse în funcție de
+structura grafului. Strategia urmărește atribuirea aceleiași culori unui număr
+cât mai mare de vârfuri neadiacente, însă eficiența acestei abordări este
+influențată de densitatea și distribuția muchiilor.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\linewidth]{rlf_colors.png}
+\caption{Numărul de culori utilizate de algoritmul RLF în funcție de densitatea grafului.}
+\label{fig:rlf_colors}
+\end{figure}
+
+Rezultatele indică o variabilitate mai mare a numărului de culori utilizate
+comparativ cu DSATUR. Pentru grafuri dense, identificarea unor mulțimi
+independente mari devine mai dificilă, ceea ce limitează posibilitatea de a
+colora simultan mai multe vârfuri cu aceeași culoare și conduce, în consecință,
+la utilizarea unui număr mai mare de culori.
+
+Cu toate acestea, în anumite instanțe, algoritmul RLF oferă rezultate
+competitive, apropiate de optim, în special atunci când structura grafului
+permite formarea unor mulțimi independente suficient de mari. Acest comportament
+confirmă faptul că performanța algoritmului este puternic dependentă de
+structura instanței analizate.
+
+\newpage
+
+\subsubsection{Comparație între algoritmi}
+
+Figura~\ref{fig:colors_vs_density} prezintă o comparație directă a numărului de
+culori utilizate de cei trei algoritmi analizați — backtracking, DSATUR și
+Recursive Largest First — în funcție de densitatea grafului. Algoritmul de
+backtracking este utilizat ca referință, deoarece furnizează în toate cazurile
+soluția optimă, stabilind valoarea exactă a numărului cromatic. Algoritmii
+euristici DSATUR și RLF tind să aproximeze această valoare, însă cu grade diferite
+de stabilitate și acuratețe.
+
+Experimentele au fost rulate pe aceeași platformă hardware, utilizând un procesor
+Intel Core i5, cu arhitectură \emph{x86\_64}, și 8\,GB de memorie RAM. Execuția a
+fost realizată în regim single-thread, pentru a elimina influența paralelismului
+asupra rezultatelor. Toți algoritmii au fost compilați și executați în aceleași
+condiții de rulare, pe același sistem de operare și cu aceleași opțiuni de
+optimizare ale compilatorului, astfel încât diferențele observate să reflecte
+exclusiv comportamentul algoritmic și strategiile de colorare utilizate.
+
+Rezultatele arată că DSATUR se remarcă printr-un comportament constant și soluții
+foarte apropiate de optim pentru majoritatea instanțelor, indiferent de
+densitatea grafului. Algoritmul RLF prezintă fluctuații mai pronunțate, ceea ce
+indică o sensibilitate mai mare la structura grafului și la distribuția
+muchilor. În ansamblu, comparația evidențiază faptul că, deși metodele euristice
+nu garantează obținerea soluției optime, acestea pot furniza soluții de bună
+calitate într-un cadru experimental controlat, cu un compromis acceptabil față
+de soluția optimă.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\linewidth]{colors_vs_density.png}
+\caption{Comparația numărului de culori utilizate în funcție de densitatea grafului.}
+\label{fig:colors_vs_density}
+\end{figure}
+
+\newpage
+
+\section{Concluzii}
+
+În această lucrare a fost realizată o analiză experimentală a problemei
+NP-2 Graph Coloring, comparând un algoritm exact bazat pe backtracking cu două
+metode euristice, DSATUR și Recursive Largest First. Rezultatele obținute
+confirmă faptul că algoritmul de backtracking garantează soluția optimă, însă
+aplicabilitatea sa este limitată la grafuri de dimensiuni reduse din cauza
+complexității exponențiale.
+
+Algoritmii euristici analizați oferă soluții apropiate de optim într-un timp
+de execuție semnificativ mai mic, fiind mai potriviți pentru instanțe de
+dimensiuni mai mari. DSATUR se remarcă printr-un comportament stabil și un
+echilibru bun între calitatea soluției și eficiență, în timp ce RLF poate fi
+avantajos pentru grafuri dense, dar cu o variabilitate mai mare a rezultatelor.
+
+În concluzie, alegerea algoritmului potrivit depinde de dimensiunea și
+structura grafului analizat. Metodele exacte sunt utile ca referință teoretică,
+în timp ce euristicile reprezintă soluții practice eficiente pentru aplicații
+reale. Studiul evidențiază compromisurile fundamentale dintre optimalitate și
+eficiență în rezolvarea problemelor NP-hard de optimizare combinatorială.
+
+\begin{thebibliography}{8}
+
+\bibitem{garey}
+M. R. Garey and D. S. Johnson,
+\textit{Computers and Intractability: A Guide to the Theory of NP-Completeness},
+W. H. Freeman, 1979.
+
+\bibitem{dsatur}
+D. Brélaz,
+New methods to color the vertices of a graph,
+\textit{Communications of the ACM}, vol. 22, no. 4, pp. 251--256, 1979.
+
+\bibitem{rlf}
+F. T. Leighton,
+A graph coloring algorithm for large scheduling problems,
+\textit{Journal of Research of the National Bureau of Standards},
+vol. 84, pp. 489--506, 1979.
+
+\bibitem{graphcoloring}
+I. Jensen and B. Toft,
+\textit{Graph Coloring Problems},
+Wiley-Interscience, 1995.
+
+\bibitem{heuristics}
+T. F. Gonzalez,
+\textit{Handbook of Approximation Algorithms and Metaheuristics},
+Chapman \& Hall/CRC, 2007.
+
+\end{thebibliography}
+
+\end{document}
