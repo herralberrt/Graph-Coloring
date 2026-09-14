@@ -1,195 +1,228 @@
 # Graph Coloring
 
-Acest proiect rezolvă problema **NP-2 Graph Coloring**. Scopul este colorarea vârfurilor unui graf neorientat astfel încât două vârfuri adiacente să nu aibă aceeași culoare, folosind un număr
-minim de culori.
+This project solves the **NP-2 Graph Coloring** problem. The goal is to color the
+vertices of an undirected graph so that no two adjacent vertices share the same
+color, using the minimum number of colors.
 
-## Algoritmi implementați
+The project compares one exact algorithm against two heuristics, both in terms
+of execution time and solution quality.
 
-În cadrul proiectului am implementat următorii algoritmi:
+## Implemented algorithms
 
 ### Backtracking
 
-Algoritmul de backtracking este un algoritm exact, care explorează toate
-posibilitățile de colorare și garantează obținerea numărului minim de culori.
+Backtracking is an exact algorithm that explores all possible colorings and is
+guaranteed to find the minimum number of colors.
 
-Avantaje:
-- oferă soluția optimă
-- util pentru grafuri mici
+Advantages:
+- returns the optimal solution
+- useful for small graphs
 
-Dezavantaje:
-- timp de execuție foarte mare pentru grafuri mai mari
-- nu este scalabil
+Disadvantages:
+- very high execution time on larger graphs
+- does not scale
 
 ### DSATUR
 
-DSATUR este un algoritm euristic care colorează vârfurile în ordinea gradului
-de saturație (numărul de culori diferite din vecinătate).
+DSATUR is a heuristic that colors vertices in order of their saturation degree
+(the number of distinct colors among their neighbors).
 
-Avantaje:
-- rapid
-- oferă soluții bune în practică
+Advantages:
+- fast
+- produces good solutions in practice
 
-Dezavantaje:
-- nu garantează soluția optimă în toate cazurile
+Disadvantages:
+- does not guarantee the optimal solution in every case
 
 ### RLF (Recursive Largest First)
 
-RLF este un algoritm euristic care construiește pe rând mulțimi independente
-maxime și le colorează succesiv.
+RLF is a heuristic that builds maximal independent sets one at a time and colors
+them successively.
 
-Avantaje:
-- eficient pentru grafuri dense
-- implementare relativ simplă
+Advantages:
+- efficient on dense graphs
+- relatively simple to implement
 
-Dezavantaje:
-- calitatea soluției depinde de structura grafului
+Disadvantages:
+- solution quality depends on the structure of the graph
 
-## Structura proiectului
-
-Structura proiectului este:
+## Project structure
 
 ```
 .
-├── backtracking.c        # Algoritm exact de colorare
-├── dsatur.c              # Algoritmul DSATUR
-├── rlf.c                 # Algoritmul RLF
-├── bin/                  # Executabilele compilate
-│   ├── backtracking
-│   ├── dsatur
-│   └── rlf
+├── backtracking.c        # Exact coloring algorithm
+├── dsatur.c              # DSATUR algorithm
+├── rlf.c                 # RLF algorithm
 ├── scripts/
-│   ├── generate_tests.py # Generator de teste
-│   ├── run_benchmarks.py # Rulare benchmark
-│   └── plot_results.py   # Generare grafice
-├── tests/                # Fisiere de test generate
-├── plots/                # Graficele rezultate
+│   ├── generate_tests.py # Test generator
+│   ├── run_benchmarks.py # Benchmark runner
+│   └── plot_results.py   # Plot generation
+├── tests/                # Generated test files
+├── plots/                # Resulting plots
 │   ├── time_vs_vertices.png
 │   ├── colors_vs_density.png
 │   └── per_algorithm/
-├── results.csv            # Rezultatele benchmark-ului
+├── results.csv           # Benchmark results
+├── main.tex              # LaTeX source of the report
+├── ProiectAA.pdf         # Project report
 └── README.md
-
 ```
 
-## Formatul de intrare și ieșire
+The compiled executables are produced in the `bin/` directory, which is not
+tracked in the repository (see `.gitignore`).
 
-Toți algoritmii folosesc același format de intrare, conform cerinței problemei.
+## Requirements
 
-### Format de intrare
-
-Un fișier de intrare conține:
-- pe prima linie: două numere întregi `n` și `m`, unde:
-  - `n` este numărul de vârfuri
-  - `m` este numărul de muchii
-- pe următoarele `m` linii: câte o muchie, sub forma `u v`
-
-Exemplu:
+- `gcc` to compile the algorithms
+- `python3` for the testing and benchmarking scripts
+- `matplotlib` to generate the plots:
 
 ```
+pip install matplotlib
+```
 
+## Building
+
+From the root directory of the project:
+
+```
+mkdir -p bin
+gcc -O2 -Wall -o bin/backtracking backtracking.c
+gcc -O2 -Wall -o bin/dsatur dsatur.c
+gcc -O2 -Wall -o bin/rlf rlf.c
+```
+
+## Input and output format
+
+All algorithms use the same input format, as required by the problem statement,
+and read their data from standard input.
+
+### Input format
+
+An input file contains:
+- on the first line: two integers `n` and `m`, where:
+  - `n` is the number of vertices
+  - `m` is the number of edges
+- on the next `m` lines: one edge per line, in the form `u v`
+
+Vertices are numbered from `0` to `n - 1`, and the maximum number of vertices
+supported by the implementations is 20.
+
+Example:
+
+```
 4 3
 0 1
 1 2
 2 3
-
 ```
 
-### Format de ieșire
+### Output format
 
-Pentru fiecare algoritm, ieșirea este:
-- pe prima linie: numărul de culori folosite
-- pe a doua linie: culorile atribuite fiecărui vârf, în ordine
+For each algorithm, the output is:
+- on the first line: the number of colors used
+- on the second line: the color assigned to each vertex, in order
 
-Exemplu:
+Example:
 
 ```
-
 2
-0 1 0 1
-
+1 0 1 0
 ```
 
-## Generarea testelor
+### Running a single algorithm
 
-Testele sunt generate automat folosind scriptul `generate_tests.py`.
-Scopul acestuia este de a crea grafuri diferite ca mărime și densitate,
-pentru a evalua comportamentul algoritmilor în diverse situații.
+```
+./bin/dsatur < tests/test_01.in
+```
 
-Scriptul generează grafuri neorientate cu:
-- număr de vârfuri între 4 și 20
-- densități diferite (raport între numărul de muchii și numărul maxim posibil)
+## Generating the tests
 
-Pentru fiecare combinație de dimensiune și densitate se generează un fișier
-de test în directorul `tests/`.
+Tests are generated automatically using the `generate_tests.py` script. Its
+purpose is to create graphs of varying size and density, in order to evaluate
+how the algorithms behave across different situations.
+
+The script generates undirected graphs with:
+- between 2 and 20 vertices
+- varying densities (the ratio between the number of edges and the maximum
+  possible number of edges)
+
+One test file is written to the `tests/` directory for each size and density
+combination. The generator uses a fixed seed (`seed = 42`), so the tests are
+reproducible.
+
+To run it, from the root directory of the project:
+
+```
+python3 scripts/generate_tests.py
+```
 
 ## Experimental setup
 
-Testele au fost limitate la grafuri cu maximum 20 de vârfuri pentru a permite
-rularea algoritmului exact (backtracking) într-un timp rezonabil. Acesta este
-folosit ca referință pentru evaluarea calității soluțiilor euristice.
+Tests were limited to graphs of at most 20 vertices so that the exact algorithm
+(backtracking) could run within a reasonable time. It is used as the reference
+point for evaluating the quality of the heuristic solutions.
 
-Pentru fiecare dimensiune a grafului au fost generate instanțe cu densități
-diferite, pentru a analiza influența structurii grafului asupra performanței
-algoritmilor.
+For each graph size, instances with different densities were generated in order
+to analyze how the structure of the graph influences algorithm performance.
 
-### Rulare generator teste
+## Running the benchmark
 
-Din directorul principal al proiectului:
+To compare algorithm performance, the project uses the `run_benchmarks.py`
+script, which runs each algorithm on every generated test and measures the
+execution time and the number of colors used.
 
-- python3 scripts/generate_tests.py
+The script:
+- runs the executables from the `bin/` directory
+- reads the test files from `tests/`
+- saves the results to `results.csv`
 
-După rulare, fișierele de intrare vor fi disponibile în directorul `tests/`
-și pot fi folosite direct de algoritmi.
+To run it:
 
-## Rularea benchmark-ului
-
-Pentru a compara performanța algoritmilor, proiectul folosește scriptul
-`run_benchmarks.py`, care rulează fiecare algoritm pe toate testele generate
-și măsoară timpul de execuție și numărul de culori folosite.
-
-Scriptul:
-- rulează executabilele din directorul `bin/`
-- citește fișierele de test din `tests/`
-- salvează rezultatele într-un fișier `results.csv`
+```
+python3 scripts/run_benchmarks.py
+```
 
 ## Solution quality
 
-Algoritmul de backtracking oferă soluția optimă pentru fiecare instanță.
-Rezultatele obținute cu algoritmii euristici (DSATUR și RLF) sunt comparate
-direct cu această soluție optimă, folosind numărul de culori ca metrică de
-calitate.
+The backtracking algorithm provides the optimal solution for every instance.
+The results obtained with the heuristics (DSATUR and RLF) are compared directly
+against this optimal solution, using the number of colors as the quality metric.
 
-## Generarea și interpretarea graficelor
+## Generating and interpreting the plots
 
-Pe baza rezultatelor obținute în urma benchmark-ului, sunt generate grafice
-care evidențiază diferențele dintre algoritmi, atât din punct de vedere al
-timpului de execuție, cât și al calității soluției.
+Based on the benchmark results, plots are generated that highlight the
+differences between the algorithms, both in execution time and in solution
+quality.
 
-Graficele sunt generate folosind scriptul `plot_results.py`.
+To run it, from the root directory of the project:
+
+```
+python3 scripts/plot_results.py
+```
+
+The script generates the following plots:
+- execution time as a function of the number of vertices (comparative)
+- number of colors as a function of graph density (comparative)
+- separate plots for each algorithm
+
+All plots are saved to the `plots/` directory.
 
 ## Observations
 
-Pentru grafuri foarte mici, timpul de execuție este dominat de costurile fixe
-de inițializare, rulare a proceselor și citire a fișierelor de intrare. Din acest
-motiv, aceste instanțe pot apărea ca fiind mai lente decât grafuri ușor mai mari.
-
-### Rulare script pentru grafice
-
-Din directorul principal al proiectului:
-
-- python3 scripts/plot_results.py
-
-Scriptul generează următoarele grafice:
-- timp de execuție în funcție de numărul de vârfuri (comparativ)
-- număr de culori în funcție de densitatea grafului (comparativ)
-- grafice separate pentru fiecare algoritm
-
-Toate graficele sunt salvate în directorul `plots/`.
+For very small graphs, execution time is dominated by fixed costs: process
+startup, initialization, and reading the input files. For this reason, those
+instances can appear slower than slightly larger graphs.
 
 ## Conclusions
 
-Algoritmul de backtracking garantează soluția optimă, dar este practic utilizabil
-doar pentru grafuri mici. Algoritmii euristici, în special DSATUR, oferă soluții
-apropiate de optim într-un timp foarte redus, fiind mai potriviți pentru grafuri
-mai mari. RLF poate fi eficient pentru grafuri dense, însă calitatea soluției
-depinde de structura instanței.
+Backtracking guarantees the optimal solution, but is only practical for small
+graphs. The heuristics, DSATUR in particular, produce near-optimal solutions in
+a very short time, making them better suited to larger graphs. RLF can be
+efficient on dense graphs, but its solution quality depends on the structure of
+the instance.
+
+## Report
+
+The full project report is available in `ProiectAA.pdf`, generated from the
+LaTeX source `main.tex`. The report itself is written in Romanian.

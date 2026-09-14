@@ -12,3 +12,14 @@ __pycache__/
 *.out
 *.log
 input.in
+
+# Fisiere generate de WSL / Windows
+*:Zone.Identifier
+.DS_Store
+
+# Fisiere auxiliare LaTeX
+*.aux
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
